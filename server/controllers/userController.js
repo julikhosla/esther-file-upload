@@ -5,9 +5,9 @@ const fs = require("fs");
 //
 const credentials = require("../my_creds.json");
 const jwtClient = new google.auth.JWT(
-	credentials.client_email,
+	process.env.CLIENT_EMAIL,
 	null,
-	credentials.private_key,
+	process.env.PRIVATE_KEY,
 	["https://www.googleapis.com/auth/drive"],
 );
 // Create a new instance of the Google Drive API
