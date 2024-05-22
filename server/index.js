@@ -1,5 +1,6 @@
+require("dotenv").config();
+
 const express = require("express");
-const multer = require("multer");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const userRoutes = require("./routes/user");
