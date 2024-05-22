@@ -46,6 +46,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage }).array("files", 10);
 
 const uploadFile = () => async (req, res) => {
+	console.log("hi");
 	upload(req, res, async (err) => {
 		if (err) {
 			return res.status(500).json({ error: err.message });
