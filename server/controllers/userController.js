@@ -4,12 +4,25 @@ const path = require("path");
 const fs = require("fs");
 //
 const credentials = require("../my_creds.json");
+// Service account credentials provided in the console
+
+// Load the service account credentials JSON file
+// const credentials = require("../esther-file-upload-b32e5ead3358.json");
+
+// Create a JWT client using the service account credentials
+
 const jwtClient = new google.auth.JWT(
-	process.env.CLIENT_EMAIL,
+	credentials.client_email,
 	null,
-	process.env.PRIVATE_KEY,
+	credentials.private_key,
 	["https://www.googleapis.com/auth/drive"],
 );
+// const jwtClient = new google.auth.JWT(
+// 	process.env.CLIENT_EMAIL,
+// 	null,
+// 	process.env.PRIVATE_KEY,
+// 	["https://www.googleapis.com/auth/drive"],
+// );
 // Create a new instance of the Google Drive API
 const drive = google.drive({ version: "v3", auth: jwtClient });
 // Configure multer to handle file uploads
