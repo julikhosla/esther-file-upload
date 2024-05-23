@@ -3,22 +3,6 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 
-const credentials = {
-	type: "service_account",
-	project_id: "esther-file-upload",
-	private_key_id: "b32e5ead3358423a5076e88225ebd297dc75875e",
-	private_key:
-		"-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCoLucWo1BN3qH+\nstckJsUyRD/SAx3t8gtPC69rzAFx9p89LAsjfzvarU/39ZBopNIt5KlcrdHtddPF\ne16DClELB21QXPpvivpOs5ygdbXxZKS+quiYo18CX4jZitfwe5/0k6eeWLDvO0WE\nM5T3yQXFZTjz6wEDQFVQ4UGxTVtdCCcvzFe1J11cGHimOEQIzYIoqMnKtlQwqzey\nIovb4TMGrbVtnfs6jO2lijHaUfrI5wo0ALfJDLBfHPpsRNMD+QgKsg7o4BTUjmZs\nnPWQQHkWQpT7fVbuwms+FsAkkzhgA6RML0kBvvlgE8iYgzC6XpzO/z7mAhmUnOvN\nSTcXDoATAgMBAAECggEACJiLw+O3h9mSHXuibbJQeqm65RmadfNq48X81+gBVVkz\nKyCCi61pfel95AR0xKjhQr/H4HHwxx4Vv/zMD1X4e+AaItFs3AwPAdilfgB5ut1C\nRo2cPeMpgbN9UCpvdx3ycSSJR0QXwv3/0b/LK4gRHtVLb/SINnDUJ+zVNFPbrPes\n+7GU4HPEfeOnPlXCT+5JRzyh2NuTGthI33TYKNae88IORCdmxcPzuF2yOGPE1F31\nbev/afJ2emQmStqZXcWcbUSXBaG9QEUfiyfFAvSFNdQYiGcuc8c7xOtTD5Ht/fjw\nxNJWYFNK0Lnfi2KACYZuNPax9rgS8ArL9hpNaW+KbQKBgQDX7TagApDgwH9WUxV0\nmI+0K6h/UKqo2uhfFSIYm3StCt9Wro3z1gX6U6VRSgoajewQqtLMCmGHqwwOzoSh\n0MeFhHaax6qVY0EibnJ5iiRzsJwigEARGZ8k5d7sgJ1l8/AsoOSO2tptuWIL8H9X\nj2pxtk6LKIqK0oIxaQxVftLmpwKBgQDHZWAT23PQgy51JqsK42IykYOCYSQDmfJN\no2NVVnxPC9eoiZBUYCuvbKMXtjGK4qA/CcTN3KVTmTR+6V3J4pPeYbDCYvRKDJ1p\nz7EHkPUetLUQVR/M0oQ/jVt0s3RSDcvILFWruGV/GDL5pXoPn8qkcvQZXmopmTcT\n8inWTJy0tQKBgCKroRjCMLcV0ZxvzMMi9/gLBowizLQ+Kg+SWh4vX+WlGEVX080y\nMVWHdsT9qW+oGB54/03p4M0i5tW9zUgaON80bMLfioFgJYY8y76+Mqos0nUruJ3G\nSmpnSosY/6zuJUNVNj3F4Eq7+IVIQXoyufm2NxhbExvFP0hlwKg9q+mDAoGBAJ/p\n3bQPPELt8kRiTqrc0dRcf2wBHDEHNhyt/OxkAC4lAUBZkzcYKfD235YUuIb6Wio0\nW3H+k1kIdeGSp3VSEeU309sSIXmBxH0n5IJ87xlBNDV1D5vk+cs+QyrFAXUNO3G+\nnLarnDrh3X/6BnqhXJOm3b26ysmx50pH3OXRa5xBAoGBAKY5dqvUuizFHyUHpvTG\nm2STIbR895ffVDGVOec0ha/9oQOVvdFl6NEWekmCcO7yrBkXq76ogO5Q6R/32GSk\nxLhC8UcKMe9XOzd198i1+fQKUDpkXJ5G2LPgoTwUb5EPOoLWlrKywVchPrHwUNNi\nBFPkeDjw194nGgx5Wn2ByMKT\n-----END PRIVATE KEY-----\n",
-	client_email: "esther-file-upload@esther-file-upload.iam.gserviceaccount.com",
-	client_id: "115558915922975628995",
-	auth_uri: "https://accounts.google.com/o/oauth2/auth",
-	token_uri: "https://oauth2.googleapis.com/token",
-	auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
-	client_x509_cert_url:
-		"https://www.googleapis.com/robot/v1/metadata/x509/esther-file-upload%40esther-file-upload.iam.gserviceaccount.com",
-	universe_domain: "googleapis.com",
-};
-
 // const credentials = require("../my_creds.json");
 // Service account credentials provided in the console
 
@@ -28,9 +12,9 @@ const credentials = {
 // Create a JWT client using the service account credentials
 
 const jwtClient = new google.auth.JWT(
-	credentials.client_email,
+	process.env.CLIENT_EMAIL,
 	null,
-	credentials.private_key,
+	process.env.PRIVATE_KEY,
 	["https://www.googleapis.com/auth/drive"],
 );
 // const jwtClient = new google.auth.JWT(
