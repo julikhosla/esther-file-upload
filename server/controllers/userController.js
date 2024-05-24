@@ -180,7 +180,7 @@ const uploadFile = () => async (req, res) => {
 						fields: "id",
 					},
 					(err, file) => {
-						fs.unlinkSync(tempFilePath);
+						// fs.unlinkSync(tempFilePath);
 						if (err) {
 							console.error("Error uploading file:", err);
 							res.status(500).send("Error uploading file");
