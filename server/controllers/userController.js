@@ -2,6 +2,8 @@ const { google } = require("googleapis");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const mime = require("mime-types");
+const Files = require("../model/File");
 
 // const key = require("./julik.json");
 // const key = require("./ruthk.json");
@@ -31,36 +33,43 @@ const getFiles = () => async (req, res) => {
 	// const folderIdentifier = "test17";
 	// const folderIdentifier = "Wes & Es Wedding Pictures";
 
+	const tempFolderPath = path.join(__dirname, "temp");
 	try {
-		const files = [];
+		const resources = await Files.find();
 
-		async function retrieveFiles(pageToken) {
-			const params = {
-				q: `'${folderId}' in parents`,
-				fields: "nextPageToken, files(id, name, webContentLink)",
-				pageSize: 1000,
-			};
-			if (pageToken) {
-				params.pageToken = pageToken;
-			}
+		res.status(200).json(resources);
 
-			const driveRes = await drive.files.list(params);
+		// const files = [];
 
-			driveRes.data.files.forEach((file) => {
-				const imageUrl = file.webContentLink;
-				const imageName = file.name;
-				const imageId = file.id;
-				files.push({ url: imageUrl, name: imageName, id: imageId });
-			});
+		// async function retrieveFiles(pageToken) {
+		// 	const params = {
+		// 		q: `'${folderId}' in parents`,
+		// 		fields: "nextPageToken, files(id, name, webViewLink)",
+		// 		pageSize: 1000,
+		// 	};
+		// 	if (pageToken) {
+		// 		params.pageToken = pageToken;
+		// 	}
 
-			if (driveRes.data.nextPageToken) {
-				await retrieveFiles(driveRes.data.nextPageToken);
-			}
-		}
+		// 	const driveRes = await drive.files.list(params);
 
-		await retrieveFiles();
-		res.status(200).send(files);
-		return files;
+		// 	// Update permissions to allow access to anyone with the link
+		// 	driveRes.data.files.forEach((file) => {
+		// 		const imageUrl = file.webViewLink;
+		// 		const imageName = file.name;
+		// 		const imageId = file.id;
+		// 		files.push({ url: imageUrl, name: imageName, id: imageId });
+		// 	});
+
+		// 	if (driveRes.data.nextPageToken) {
+		// 		await retrieveFiles(driveRes.data.nextPageToken);
+		// 	}
+		// }
+
+		// await retrieveFiles();
+
+		// res.status(200).send(files);
+		// return files;
 
 		// async function retrieveFolders(pageToken) {
 		// 	const params = {
@@ -160,23 +169,36 @@ const uploadFile = () => async (req, res) => {
 			}
 
 			for (const file of req.files) {
+				const { mimetype, originalname } = file;
+
+				const tempFilePath = path.join(__dirname, "temp", file.originalname);
+
+				fs.writeFileSync(tempFilePath, file.buffer);
+				const newResource = new Files({
+					file: {
+						contentType: mimetype,
+						data: fs.readFileSync(tempFilePath),
+						path: tempFilePath,
+					},
+					fileType: mimetype,
+					originalname,
+				});
+				await newResource.save();
+
 				const fileMetadata = {
-					name: file.originalname,
+					name: originalname,
 					parents: [folderId],
 				};
 
-				const tempFilePath = path.join(__dirname, "temp", file.originalname);
-				fs.writeFileSync(tempFilePath, file.buffer);
-
 				const media = {
-					mimeType: file.mimetype,
+					mimeType: mimetype,
 					body: fs.createReadStream(tempFilePath),
 				};
 
 				drive.files.create(
 					{
 						resource: fileMetadata,
-						media: media,
+						media,
 						fields: "id",
 					},
 					(err, file) => {
@@ -186,10 +208,11 @@ const uploadFile = () => async (req, res) => {
 							res.status(500).send("Error uploading file");
 							return;
 						}
-						res.status(200).send(file.data.id);
+						console.log(file.data.id);
 					},
 				);
 			}
+			res.status(200).json("newResource");
 		} catch (error) {
 			console.error("Error handling file upload:", error);
 			res.status(500).send("Error handling file upload");
