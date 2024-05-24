@@ -1,8 +1,7 @@
 import { RouterProvider, createBrowserRouter } from "react-router-dom";
-import "./App.css";
-import UploadPage from "./components/FileUpload";
-import ScanPage from "./components/ScanPage";
+
 import FileUploadComponent from "./components/FileUploadComponent";
+// import ScanPage from "./components/ScanPage";
 
 function App() {
 	const router = createBrowserRouter([
@@ -11,10 +10,10 @@ function App() {
 			exact: true,
 			element: <FileUploadComponent />,
 		},
-		{
-			path: "/upload/:qrData",
-			element: <UploadPage />,
-		},
+		// {
+		// 	path: "/qr_code",
+		// 	element: <ScanPage />,
+		// },
 	]);
 	return <RouterProvider router={router} />;
 }

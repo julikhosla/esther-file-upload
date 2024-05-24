@@ -3,17 +3,21 @@ import {
 	Box,
 	Button,
 	Center,
+	HStack,
+	Heading,
+	Image,
 	Progress,
 	Text,
+	VStack,
 	useToast,
 } from "@chakra-ui/react";
 import React, { useCallback, useState } from "react";
 import { useDropzone } from "react-dropzone";
-
+import coverImg from "../assets/coverImg.jpeg";
 import ActivityService from "./ActivityService";
+import "./custom.css";
 
 const FileUploadComponent = () => {
-	// const [selectedFile, setSelectedFile] = useState(null);
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [uploading, setUploading] = useState(false);
 	const [uploadedFiles, setUploadedFiles] = useState([]);
@@ -21,9 +25,6 @@ const FileUploadComponent = () => {
 	const onDrop = useCallback((acceptedFiles) => {
 		setUploadedFiles(acceptedFiles);
 	}, []);
-	// const handleFileChange = (e) => {
-	// 	setSelectedFile(e.target.files[0]);
-	// };
 	const toast = useToast();
 	const uploadFiles = async () => {
 		if (!(uploadedFiles.length > 0)) {
@@ -42,6 +43,9 @@ const FileUploadComponent = () => {
 						isClosable: true,
 					});
 					setUploading(false);
+					setTimeout(() => {
+						setUploadedFiles([]);
+					}, 3000);
 				}
 				return newProgress;
 			});
@@ -61,57 +65,100 @@ const FileUploadComponent = () => {
 
 	const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
-	// const handleUpload = async () => {
-	// 	// Simulate upload progress
-
-	// 	const formData = new FormData();
-	// 	formData.append("file", selectedFile);
-	// 	try {
-	// 		const response = await ActivityService.upload(formData);
-	// 		console.log(response.data);
-	// 	} catch (error) {
-	// 		console.error(error);
-	// 	}
-	// };
 	return (
-		<Center bg={"#caf0f8"} h={"100vh"} color={"#112A46"}>
-			<Box p={8} borderWidth={1} borderRadius={8} boxShadow="lg" bg="gray.50">
-				<Text
-					{...getRootProps()}
-					style={{
-						border: "2px dashed #ccc",
-						padding: "20px",
-						textAlign: "center",
-					}}
+		<Box>
+			<Image
+				src={coverImg}
+				alt="Cover Image"
+				objectFit="cover"
+				width="100%"
+				height={{ base: "200px", md: "300px" }}
+			/>
+			<VStack
+				backgroundColor="rgb(233 215 249 / 64%)"
+				height={"calc(100vh - 300px)"}
+			>
+				<Center>
+					<Heading
+						p={{ base: "10px 5px", md: 8 }}
+						className="great-vibes-regular"
+						size={{ base: "xl", md: "3xl" }}
+						mb={{ base: 2, md: 4 }}
+						// color="white"
+					>
+						Welcome to our Photo Library
+					</Heading>
+				</Center>
+				<HStack
+					justifyContent={"space-between"}
+					alignItems={"center"}
+					flexDir={{ base: "column", md: "row" }}
 				>
-					<input {...getInputProps()} />
-					<p>
-						Drag 'n' drop some files here, or click to select files (maximum of
-						10 files)
-					</p>
-				</Text>
-				<Button
-					mt={4}
-					colorScheme="teal"
-					onClick={uploadFiles}
-					disabled={!uploadedFiles.length === 0 || uploading}
-				>
-					Upload
-				</Button>
-
-				{uploadedFiles.length > 0 && (
-					<Text mt={2} fontSize="sm">
-						Selected file(s):
-						<ul>
-							{uploadedFiles.map((file, index) => (
-								<li key={index}>{file.name}</li>
-							))}
-						</ul>
-					</Text>
-				)}
-				{uploading && <Progress mt={4} value={uploadProgress} />}
-			</Box>
-		</Center>
+					<Box>
+						<Center>
+							<Text
+								bg={"#352b3436"}
+								{...getRootProps()}
+								style={{
+									border: "2px dashed #ccc",
+									padding: "20px",
+									textAlign: "center",
+									borderRadius: "20px",
+								}}
+							>
+								<input {...getInputProps()} />
+								<Text
+									p={{ base: 0, md: "1em 3em" }}
+									// color={"white"}
+									fontSize={{ base: "1em", md: "1.2em" }}
+								>
+									Drag 'n' drop some files here, or click to select files
+									(maximum of 10 files)
+								</Text>
+							</Text>
+						</Center>
+						<Center>
+							<Button
+								mt={4}
+								size={"lg"}
+								colorScheme="purple"
+								onClick={uploadFiles}
+								disabled={!uploadedFiles.length === 0 || uploading}
+							>
+								Upload
+							</Button>
+						</Center>
+						<Center mb={4} flexDir={"column"}>
+							{uploading && (
+								<Progress
+									w={"50%"}
+									margin={"0 auto"}
+									mt={5}
+									value={uploadProgress}
+								/>
+							)}
+							{uploadedFiles.length > 0 && (
+								<Text
+									className="fancy-heading"
+									mt={5}
+									p={"5px 2em"}
+									fontSize="sm"
+									textAlign={"left"}
+									// color={"white"}
+								>
+									Selected file(s):-
+									<ul>
+										{uploadedFiles.map((file, index) => (
+											<li key={index}>{file.name}</li>
+										))}
+									</ul>
+								</Text>
+							)}
+						</Center>
+					</Box>
+				</HStack>
+			</VStack>
+		</Box>
 	);
 };
 

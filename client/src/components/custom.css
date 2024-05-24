@@ -1,0 +1,29 @@
+:root {
+	font-family: "Montserrat", sans-serif;
+	cursor: pointer;
+	color: #333;
+	text-align: center;
+	letter-spacing: 4px;
+	margin-bottom: 20px;
+	background-color: rgb(233 215 249 / 64%);
+}
+.fancy-heading {
+	font-family: "Montserrat", sans-serif;
+	cursor: pointer;
+	color: #333;
+	text-align: center;
+	letter-spacing: 4px;
+	margin-bottom: 20px;
+}
+.great-vibes-regular {
+	font-family: "Great Vibes", "cursive" !important;
+	font-weight: 400 !important;
+	font-style: normal;
+	text-align: center;
+	word-spacing: 10px;
+}
+.success {
+	font-family: "Great Vibes", "cursive" !important;
+	color: white;
+	font-size: 2em !important;
+}
