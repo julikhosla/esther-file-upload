@@ -1,4 +1,4 @@
-import apiService from "./services";
+import apiService from ".";
 
 const ActivityService = {
 	async getFiles() {

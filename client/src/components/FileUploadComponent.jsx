@@ -3,29 +3,62 @@ import {
 	Box,
 	Button,
 	Center,
+	Flex,
 	HStack,
-	Heading,
 	Image,
 	Progress,
+	SimpleGrid,
 	Text,
-	VStack,
 	useToast,
 } from "@chakra-ui/react";
-import React, { useCallback, useState } from "react";
+import { motion } from "framer-motion";
+import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
-import coverImg from "../assets/coverImg.jpeg";
-import ActivityService from "./ActivityService";
-import "./custom.css";
+import ActivityService from "../service/ActivityService";
+import "./FileUpload.css";
 
 const FileUploadComponent = () => {
+	const AnimatedHeading = motion.div;
+	const toast = useToast();
+
 	const [uploadProgress, setUploadProgress] = useState(0);
 	const [uploading, setUploading] = useState(false);
 	const [uploadedFiles, setUploadedFiles] = useState([]);
+	const [files, setFiles] = useState([]);
+
+	useEffect(() => {
+		const fetchFiles = async () => {
+			try {
+				const response = await ActivityService.getFiles();
+				const updatedFiles = await Promise.all(
+					response.data.map(async (file) => {
+						const blob = new Blob([new Uint8Array(file.file.data.data)], {
+							type: file.file.contentType,
+						});
+						const reader = new FileReader();
+						reader.readAsDataURL(blob);
+						return new Promise((resolve, reject) => {
+							reader.onload = () => {
+								file.imageUrl = reader.result;
+								resolve(file);
+							};
+							reader.onerror = reject;
+						});
+					}),
+				);
+
+				setFiles(updatedFiles);
+			} catch (error) {
+				console.log(error);
+			}
+		};
+		fetchFiles();
+	}, [uploading]);
 
 	const onDrop = useCallback((acceptedFiles) => {
 		setUploadedFiles(acceptedFiles);
 	}, []);
-	const toast = useToast();
+
 	const uploadFiles = async () => {
 		if (!(uploadedFiles.length > 0)) {
 			return;
@@ -56,8 +89,7 @@ const FileUploadComponent = () => {
 			formData.append("files", file);
 		});
 		try {
-			const response = await ActivityService.upload(formData);
-			console.log("Files uploaded:", response.data);
+			await ActivityService.upload(formData);
 		} catch (error) {
 			console.error("Error uploading files:", error);
 		}
@@ -66,99 +98,116 @@ const FileUploadComponent = () => {
 	const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
 	return (
-		<Box>
-			<Image
-				src={coverImg}
-				alt="Cover Image"
-				objectFit="cover"
-				width="100%"
-				height={{ base: "200px", md: "300px" }}
-			/>
-			<VStack
-				backgroundColor="rgb(233 215 249 / 64%)"
-				height={"calc(100vh - 300px)"}
-			>
-				<Center>
-					<Heading
-						p={{ base: "10px 5px", md: 8 }}
-						className="great-vibes-regular"
-						size={{ base: "xl", md: "3xl" }}
-						mb={{ base: 2, md: 4 }}
-						// color="white"
-					>
-						Welcome to our Photo Library
-					</Heading>
-				</Center>
-				<HStack
-					justifyContent={"space-between"}
-					alignItems={"center"}
-					flexDir={{ base: "column", md: "row" }}
+		<HStack
+			justifyContent={"space-between"}
+			alignItems={"start"}
+			w={"95%"}
+			flexDir={{ base: "column", md: "row" }}
+		>
+			<Box>
+				<Text
+					{...getRootProps()}
+					style={{
+						border: "2px dashed #ccc",
+						padding: "10px",
+						textAlign: "center",
+						borderRadius: "20px",
+					}}
 				>
-					<Box>
-						<Center>
-							<Text
-								bg={"#352b3436"}
-								{...getRootProps()}
-								style={{
-									border: "2px dashed #ccc",
-									padding: "20px",
-									textAlign: "center",
-									borderRadius: "20px",
-								}}
-							>
-								<input {...getInputProps()} />
-								<Text
-									p={{ base: 0, md: "1em 3em" }}
-									// color={"white"}
-									fontSize={{ base: "1em", md: "1.2em" }}
-								>
-									Drag 'n' drop some files here, or click to select files
-									(maximum of 10 files)
-								</Text>
-							</Text>
-						</Center>
-						<Center>
-							<Button
-								mt={4}
-								size={"lg"}
-								colorScheme="purple"
-								onClick={uploadFiles}
-								disabled={!uploadedFiles.length === 0 || uploading}
-							>
-								Upload
-							</Button>
-						</Center>
-						<Center mb={4} flexDir={"column"}>
-							{uploading && (
-								<Progress
-									w={"50%"}
-									margin={"0 auto"}
-									mt={5}
-									value={uploadProgress}
-								/>
-							)}
-							{uploadedFiles.length > 0 && (
-								<Text
-									className="fancy-heading"
-									mt={5}
-									p={"5px 2em"}
-									fontSize="sm"
-									textAlign={"left"}
-									// color={"white"}
-								>
-									Selected file(s):-
-									<ul>
-										{uploadedFiles.map((file, index) => (
-											<li key={index}>{file.name}</li>
-										))}
-									</ul>
-								</Text>
-							)}
-						</Center>
-					</Box>
+					<input {...getInputProps()} />
+					<Text
+						p={{ base: 0, md: "1em 3em" }}
+						// color={"white"}
+						fontSize={{ base: "md", md: "1.2em" }}
+						textDecor={"underline"}
+					>
+						<b>Tap here</b> to select files (maximum of 10 files)
+					</Text>
+				</Text>
+				<HStack spacing={5} mt={4} justifyContent={"center"}>
+					<Button
+						colorScheme="purple"
+						size={"sm"}
+						onClick={getRootProps().onClick}
+						isDisabled={uploadedFiles.length > 0}
+					>
+						Add files
+					</Button>
+					<Button
+						colorScheme="purple"
+						onClick={uploadFiles}
+						size={"sm"}
+						isLoading={uploading}
+						isDisabled={uploadedFiles.length === 0}
+					>
+						Upload
+					</Button>
 				</HStack>
-			</VStack>
-		</Box>
+				<Center mb={4} flexDir={"column"}>
+					{uploading && (
+						<Progress
+							w={"50%"}
+							margin={"0 auto"}
+							mt={5}
+							value={uploadProgress}
+						/>
+					)}
+					{uploadedFiles.length > 0 && (
+						<Text
+							className="fancy-heading"
+							mt={4}
+							p={"5px"}
+							fontSize="sm"
+							textAlign={"center"}
+							// color={"white"}
+						>
+							<Flex flexWrap="wrap" gap={"10px"}>
+								{uploadedFiles.map((file) => (
+									<HStack
+										key={file.name}
+										spacing={3}
+										justifyContent={"space-between"}
+										flexWrap={"wrap"}
+									>
+										{file.type.startsWith("image/") && (
+											<img
+												src={URL.createObjectURL(file)}
+												alt={file.name}
+												style={{ maxWidth: "80px", maxHeight: "80px" }}
+											/>
+										)}
+									</HStack>
+								))}
+							</Flex>
+						</Text>
+					)}
+				</Center>
+			</Box>
+			<Box>
+				<Center>
+					<AnimatedHeading
+						as="h1"
+						size={{ base: "lg", md: "xxl" }}
+						initial={{ opacity: 0, y: -50 }}
+						animate={{ opacity: 1, y: 0 }}
+						transition={{ duration: 0.5 }}
+						className="great-vibes-regular sub_heading"
+					>
+						Image Gallery Scavenger Hunt
+					</AnimatedHeading>
+				</Center>
+				<SimpleGrid columns={{ base: 3, lg: 6 }} spacing={3}>
+					{!uploading &&
+						files?.map(({ _id, originalname, imageUrl }) => (
+							<React.Fragment key={_id}>
+								{imageUrl && (
+									<Image src={imageUrl} w={"100px"} alt={originalname} />
+								)}
+							</React.Fragment>
+						))}
+				</SimpleGrid>
+			</Box>
+		</HStack>
 	);
 };
 

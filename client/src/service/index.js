@@ -11,7 +11,6 @@ const buildURL = (path) => {
 
 const fetchData = async (path, params) => {
 	return API.get(buildURL(path));
-	// return await (await fetch(url.href)).json();
 };
 
 const postData = async (path, data) => {

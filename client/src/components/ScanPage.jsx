@@ -1,4 +1,3 @@
-// ScanPage.js
 import { Box, Center } from "@chakra-ui/react";
 import jsQR from "jsqr";
 import QRCode from "qrcode";
@@ -15,7 +14,7 @@ const ScanPage = () => {
 			const redirectUrl = "https://estherandwesley.netlify.app/";
 
 			await QRCode.toCanvas(canvas, redirectUrl);
-			// Convert canvas to image and save
+
 			const image = canvas
 				.toDataURL("image/png")
 				.replace("image/png", "image/octet-stream");
@@ -39,7 +38,7 @@ const ScanPage = () => {
 
 		try {
 			const reader = new FileReader();
-			// Read the file as data URL
+
 			reader.onload = async (event) => {
 				const arrayBuffer = event.target.result;
 
